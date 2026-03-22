@@ -17,11 +17,7 @@ url = f"https://serpapi.com/search?engine=google&q=AI+jobs&api_key={API_KEY}"
 ## Making the API request
 job_data = utils.requesting_job_data(url)
 
+
 ## Saving the data to a JSON file
-
-# Ensure directory exists
-os.makedirs("../data/raw", exist_ok=True)
-
-with open('../data/raw/job_data.json', 'w') as f:
-    json.dump(job_data, f, indent=4)   
+utils.save_to_json(job_data) 
 
