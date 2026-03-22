@@ -1,0 +1,106 @@
+# 🔐 Environment Variables
+
+.env
+.env.*
+
+# 🐍 Python
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+
+venv/
+env/
+ENV/
+.venv/
+
+# Distribution / packaging
+
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 🧪 Testing
+
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
+
+# 📊 Data files (important for ETL projects)
+
+data/raw/*
+data/processed/*
+*.csv
+*.parquet
+*.json
+
+# But keep folder structure
+
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# 📓 Jupyter Notebooks
+
+.ipynb_checkpoints
+
+# 🧾 Logs
+
+logs/
+*.log
+
+# ⚙️ IDE / Editor
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 🐳 Docker
+
+*.pid
+*.seed
+*.pid.lock
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+# 🧰 Airflow
+
+airflow.db
+airflow.cfg
+**pycache**/
+logs/
+
+# 🔑 Secrets / Keys
+
+*.pem
+*.key
+
+# 🧪 Temporary files
+
+tmp/
+temp/
+
+# 📦 Cache
+
+.cache/
