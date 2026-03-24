@@ -4,7 +4,7 @@
 
 This project implements a **production-style ETL (Extract, Transform, Load) data pipeline** using the SerpApi Search API to collect and process search engine results data.
 
-The system is designed to simulate real-world **data engineering workflows**, including data ingestion, transformation, storage, and analytics.
+The system is designed to simulate real-world **data engineering workflows**, including data ingestion, transformation, storage, and analytics and Orchestrated ETL pipeline using Apache Airflow with scheduled execution and monitoring.
 
 ---
 
