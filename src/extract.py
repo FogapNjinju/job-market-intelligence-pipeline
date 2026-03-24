@@ -127,16 +127,21 @@ company_name = []
 location = []
 descriptions = []
 job_types = []
+share_links = []
+qaulifications = []
 
 for city in all_locations:
     jobs = utils.get_jobs_with_serpapi(client, query, [city])
     if jobs:
         for job in jobs:
+            print(("=" * 50))
             title.append(job.get('title'))
             company_name.append(job.get('company_name'))
             location.append(job.get('location'))
             descriptions.append(job.get('description'))
             job_types.append(job.get('detected_extensions', {}).get('schedule_type'))
+            qaulifications.append(job.get('detected_extensions', {}).get('qualifications'))
+            share_links.append(job.get('share_link'))
 
 
 

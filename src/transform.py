@@ -1,5 +1,4 @@
 from pathlib import Path
-import json
 import utils
 import extract
 
@@ -18,11 +17,13 @@ title = extract.title
 company_name = extract.company_name
 descriptions = extract.descriptions
 job_types = extract.job_types
+qualifications = extract.qaulifications
+share_links = extract.share_links
+
 
 ## cleaning of location
 ## remove duplicate locations
 unique_locations = list(set(location))
-
 
 
 ## seperate city, country
@@ -35,3 +36,6 @@ for loc in location:
    countries.append(country)
 
 
+
+## cleaning of descriptions
+descriptions = utils.clean_descriptions(descriptions)

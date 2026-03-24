@@ -1,6 +1,10 @@
 import requests
 import os
 import json
+import re
+import time
+import random
+
 
 def requesting_job_data(url, headers=None, params=None):
     '''Function to make an API request and return the JSON response.'''
@@ -37,21 +41,46 @@ def load_from_json(file_path):
         return None
     
 
-def get_jobs_with_serpapi(client, query, location):
-    '''Function to get job listings using SerpAPI.'''
-    try:
-        results = client.search({
-            "engine": "google_jobs",
-            "q": query,
-            "location": location,
-            "google_domain": "google.com",
-            "hl": "en",
-            "gl": "us"
-        })
-        return results.get("jobs_results", [])
-    except Exception as e:
-        print(f"An error occurred while fetching jobs: {e}")
-        return []
+def get_jobs_with_serpapi(client, query, location, max_retries=5, base_delay=2):
+    '''Function to get job listings using SerpAPI with retry/backoff for 429 rate limits.'''
+
+    if isinstance(location, list):
+        if len(location) == 1:
+            location_value = location[0]
+        else:
+            location_value = ", ".join(location)
+    else:
+        location_value = location
+
+    attempt = 1
+    while attempt <= max_retries:
+        try:
+            results = client.search({
+                "engine": "google_jobs",
+                "q": query,
+                "location": location_value,
+                "google_domain": "google.com",
+                "hl": "en",
+                "gl": "us"
+            })
+            # gentle pacing to reduce rate-limits
+            time.sleep(1)
+            return results.get("jobs_results", [])
+        except Exception as e:
+            message = str(e)
+            is_rate_limit = "429" in message or "Too Many Requests" in message
+            if attempt == max_retries:
+                print(f"An error occurred while fetching jobs (final attempt): {e}")
+                return []
+            delay = base_delay * (2 ** (attempt - 1)) + random.uniform(0, 1)
+            if is_rate_limit:
+                print(f"Rate limit hit (429) for location '{location_value}'. retry {attempt}/{max_retries} in {delay:.1f}s")
+            else:
+                print(f"Fetch error for location '{location_value}'. retry {attempt}/{max_retries} in {delay:.1f}s: {e}")
+            time.sleep(delay)
+            attempt += 1
+
+    return []
     
 
 def transform_jobs(data: list) -> dict:
@@ -95,3 +124,22 @@ def separate_city_country(location):
     except Exception as e:
         print(f"An error occurred while separating city and country: {e}")
         return location, None
+    
+
+def clean_descriptions(descriptions):
+    cleaned = set()
+
+    for text in descriptions:
+        if not text:
+            continue
+
+        # Normalize formatting
+        text = re.sub(r'\n+', ' ', text)   # remove newlines
+        text = re.sub(r'\s+', ' ', text)   # remove extra spaces
+        text = re.sub(r'•', '', text)      # remove bullet points
+
+        text = text.strip().lower()
+
+        cleaned.add(text)  # set removes duplicates
+
+    return list(cleaned)
