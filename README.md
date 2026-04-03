@@ -30,8 +30,8 @@ SerpApi → Extraction Layer → Raw Data Storage → Transformation Layer → P
 * **Programming:** Python
 * **Data Processing:** Pandas / PySpark
 * **API Integration:** Requests
-* **Storage:** CSV / Parquet / PostgreSQL
-* **Orchestration:** Apache Airflow (optional)
+* **Storage:** CSV / Parquet / PostgreSQL / SQLite
+* **Orchestration:** Apache Airflow
 * **Environment Management:** python-dotenv
 * **Version Control:** Git & GitHub
 
@@ -46,17 +46,23 @@ serpapi-etl-data-pipeline/
 │   ├── raw/                # Raw JSON responses
 │   ├── processed/          # Cleaned datasets
 │
+├── dags/
+│   └── job_market_etl_dag.py  # Airflow DAG for orchestration
+│
 ├── src/
 │   ├── extract.py          # API ingestion logic
 │   ├── transform.py        # Data cleaning & transformation
 │   ├── load.py             # Storage logic
+│   ├── utils.py            # Helper functions
 │
 ├── config/
-│   └── config.json         # Query parameters & pipeline settings
+│   └── config.json         # Query parameters, locations, and pipeline settings
 │
 ├── notebooks/              # Exploratory analysis
 ├── tests/                  # Unit tests
 │
+├── docker-compose.yml      # Docker Compose configuration
+├── Dockerfile              # Custom Airflow Docker image
 ├── requirements.txt
 ├── .env                    # API keys (not committed)
 ├── .gitignore
@@ -93,12 +99,71 @@ pip install -r requirements.txt
 Create a `.env` file:
 
 ```
-SERPAPI_KEY=your_api_key_here
+API_KEY=your_serpapi_key_here
 ```
+
+### 5. Configure Pipeline Settings
+
+The `config/config.json` file contains all pipeline configuration:
+
+- **query**: Job search term (default: "Barista")
+- **locations**: Dictionary of location tiers (UK/US cities)
+- **max_retries**: Number of API retry attempts (default: 5)
+- **base_delay**: Base delay between retries in seconds (default: 2)
+
+You can modify these settings to customize your job search.
+
+---
+
+This project includes Docker configuration for easy deployment with Apache Airflow.
+
+#### Prerequisites
+- Docker and Docker Compose installed
+
+#### Quick Start with Docker
+
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Or run in background
+docker-compose up -d --build
+```
+
+#### Access Airflow
+- Web UI: http://localhost:8080
+- Default credentials: admin / admin
+
+#### Stop Services
+```bash
+docker-compose down
+```
+
+#### Data Persistence
+
+- Processed data is stored in the `data/` directory on your host machine
+- Airflow metadata is stored in the `postgres_data` Docker volume
+- Logs are stored in the `airflow_logs` Docker volume
+
+#### Troubleshooting
+
+- If you encounter permission issues, ensure Docker has access to the project directory
+- For Windows users, you may need to enable file sharing in Docker settings
+- Check container logs: `docker-compose logs <service_name>`
 
 ---
 
 ## ▶️ Running the Pipeline
+
+### Option 1: Docker (Recommended)
+
+```bash
+docker-compose up --build
+```
+
+Access Airflow UI at http://localhost:8080 and trigger the `job_market_etl_pipeline` DAG.
+
+### Option 2: Manual Execution
 
 ### Step 1: Extract Data
 
@@ -118,7 +183,32 @@ python src/transform.py
 python src/load.py
 ```
 
+### Option 3: Using Airflow Locally
+
+1. Install dependencies: `pip install -r requirements.txt`
+2. Set environment variables as described above
+3. Initialize and start Airflow
+4. Access the Airflow web UI at `http://localhost:8080`
+5. Enable the `job_market_etl_pipeline` DAG
+6. Trigger the DAG manually or wait for the scheduled run
+
+## 🧪 Testing
+
+Run the unit tests:
+
+```bash
+python -m unittest tests/ -v
+```
+
+Validate your configuration:
+
+```bash
+python validate_config.py
+```
+
 ---
+
+## 📊 Sample Output
 
 ## 🔄 Example Use Case
 
@@ -141,11 +231,11 @@ This pipeline can be used to:
 
 ## 🚀 Future Improvements
 
-* Integrate **Apache Airflow** for scheduling
 * Store data in **cloud storage (AWS S3 / GCP)**
-* Add **Docker containerization**
-* Build **interactive dashboard (Streamlit / Power BI)**
+* Add **data quality checks and monitoring**
 * Implement **ML models for trend prediction**
+* Add **interactive dashboard (Streamlit / Power BI)**
+* Expand to **additional job search APIs**
 
 ---
 

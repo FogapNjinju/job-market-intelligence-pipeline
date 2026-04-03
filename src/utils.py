@@ -18,14 +18,14 @@ def requesting_job_data(url, headers=None, params=None):
     
 
     
-def save_to_json(data):
+def save_to_json(data, file_path):
     '''Function to save data to a JSON file.'''
     try:
-        os.makedirs("../data/raw", exist_ok=True)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        with open('../data/raw/job_data.json', 'w') as f:
+        with open(file_path, 'w') as f:
             json.dump(data, f, indent=4)
-        print(f"Data successfully saved to ../data/raw/job_data.json") 
+        print(f"Data successfully saved to {file_path}") 
     except IOError as e:
         print(f"An error occurred while saving to file: {e}")
 

@@ -1,0 +1,12 @@
+FROM apache/airflow:2.9.0
+
+# Install additional dependencies
+RUN pip install --no-cache-dir \
+    pandas==2.0.3 \
+    requests==2.31.0 \
+    python-dotenv==1.0.0 \
+    serpapi==0.1.5 \
+    psycopg2-binary==2.9.7
+
+# Set user back to airflow
+USER airflow
